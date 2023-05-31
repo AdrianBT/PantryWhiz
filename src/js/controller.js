@@ -2,6 +2,7 @@ import * as model from './model.js'
 import recipeView from './views/recipeView.js'
 import searchView from './views/searchView.js'
 import resultsView from './views/resultsView.js';
+import paginationView from './views/paginationView.js';
 
 import 'core-js/stable';
 import 'regenerator-runtime/runtime'
@@ -15,8 +16,11 @@ const controlRecpie = async function () {
     if (!id) return;
     recipeView.renderSpinner();
 
-    // loading 
-    await model.loadRecipe(id)
+    // update results view to mark selected search results
+    resultsView.update(model.getSearchResultsPage());
+
+    // loading  recipe 
+    await model.loadRecipe(id);
     // recipe is loaded here and and stored in the state object
 
 
@@ -32,7 +36,6 @@ const controlRecpie = async function () {
   }
 }
 
-controlRecpie();
 
 const controlSearchResults = async function () {
   try {
@@ -47,17 +50,39 @@ const controlSearchResults = async function () {
 
     // render results 
     console.log(model.state.search.results)
-    resultsView.render(model.state.search.results)
+    // resultsView.render(model.state.search.results)
+    resultsView.render(model.getSearchResultsPage())
+
+    // render the pagination for button 
+    paginationView.render(model.state.search)
 
   } catch (err) {
     console.log(err);
   }
 }
 
+const controlPagination = function (goToPage) {
+  // Render New results 
+  resultsView.render(model.getSearchResultsPage(goToPage))
+
+  // render New pagination for button 
+  paginationView.render(model.state.search)
+}
+
+const controlServings = function (newServings) {
+  // update the recipe servings (in state)
+  model.updateServings(newServings);
+  // update the recipe view 
+  // recipeView.render(model.state.recipe);
+  recipeView.update(model.state.recipe);
+}
 
 const init = function () {
   recipeView.addHandlerRender(controlRecpie);
-  searchView.addHandlerSearch(controlSearchResults)
+  recipeView.addHandlerUpdtaeServing(controlServings)
+  searchView.addHandlerSearch(controlSearchResults);
+  paginationView.addHandlerClick(controlPagination)
+
 }
 
 init();
