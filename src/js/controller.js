@@ -3,6 +3,7 @@ import recipeView from './views/recipeView.js'
 import searchView from './views/searchView.js'
 import resultsView from './views/resultsView.js';
 import paginationView from './views/paginationView.js';
+import bookmarksview from './views/bookmarksview.js';
 
 import 'core-js/stable';
 import 'regenerator-runtime/runtime'
@@ -77,11 +78,24 @@ const controlServings = function (newServings) {
   recipeView.update(model.state.recipe);
 }
 
+const controlAddBookmark = function () {
+  // add or remove bookmark
+  if (!model.state.recipe.bookmarked) model.addBookmark(model.state.recipe)
+  else model.deleteBookmark(model.state.recipe.id)
+  console.log(model.state.recipe)
+  // update recipe view
+  recipeView.update(model.state.recipe)
+  // rebder bookmark
+  bookmarksview.render(model.state.bookmarks)
+}
+
 const init = function () {
   recipeView.addHandlerRender(controlRecpie);
   recipeView.addHandlerUpdtaeServing(controlServings)
+  recipeView.addHandlerAddBookmark(controlAddBookmark)
   searchView.addHandlerSearch(controlSearchResults);
   paginationView.addHandlerClick(controlPagination)
+
 
 }
 
